@@ -164,19 +164,30 @@ class _PageTemplateState extends State<PageTemplate> {
   }
 
   // Widget para exibir os itens secundários de forma adaptável
-  Widget itemWidget(String imageUrl, String nome, double screenWidth) {
+  Widget itemWidget(String imageUrl, String name, double screenWidth) {
+    double imageSize = screenWidth * 0.15; // Tamanho fixo para todas as imagens
+    imageSize = imageSize.clamp(50, 80); // Limitando o tamanho mínimo e máximo
+
     return Column(
       children: [
-        Image.network(imageUrl, width: screenWidth * 0.1, fit: BoxFit.cover),
+        Container(
+          width: imageSize,
+          height: imageSize,
+          child: Image.network(
+            imageUrl,
+            fit: BoxFit.contain, // Mantém a proporção original sem distorcer
+          ),
+        ),
         SizedBox(height: 5),
         Text(
-          nome,
+          name,
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: screenWidth * 0.035, fontWeight: FontWeight.bold),
         ),
       ],
     );
   }
+
 
   // Widget para os botões de adicionar/remover com espaçamento adaptável
   Widget botaoQuantidade(IconData icon, Color color, VoidCallback onPressed) {
