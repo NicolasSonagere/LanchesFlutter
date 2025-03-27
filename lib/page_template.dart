@@ -16,23 +16,24 @@ class _PageTemplateState extends State<PageTemplate> {
   int contador = 0;
 
   int get precoItem {
-    if (widget.item.nome == 'Turbinado') {
-      return turbinado;  // Preço do Turbinado
-    } else if (widget.item.nome == 'Donuts da Joana') {
-      return Joana;  // Preço do Donuts da Joana
-    } else if (widget.item.nome == 'Picolero') {
-      return Picolero;  // Preço do Picolero
-    }
+    if (widget.item.nome == 'Turbinado') return turbinado;
+    if (widget.item.nome == 'Donuts da Joana') return Joana;
+    if (widget.item.nome == 'Picolero') return Picolero;
     return 0;
   }
 
-  // Preço total
-  int get precoTotal {
-    return contador * precoItem;
-  }
+  int get precoTotal => contador * precoItem;
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    // Definir espaçamentos proporcionais ao tamanho da tela
+    double spacing = screenWidth * 0.05; // Aumenta conforme a tela cresce
+    double imageSize = screenHeight * 0.15; // Tamanho das imagens adaptável
+    double fontSize = screenWidth * 0.045; // Fonte ajustável
+
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -43,166 +44,157 @@ class _PageTemplateState extends State<PageTemplate> {
       ),
       child: Center(
         child: Container(
-          width: 400,
-          height: 650,
+          width: screenWidth * 0.85,
+          height: screenHeight * 0.75,
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(25),
+            borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
                 color: Colors.black26,
-                blurRadius: 10,
-                offset: Offset(0, 8),
+                blurRadius: 8,
+                offset: Offset(0, 5),
               ),
             ],
           ),
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(spacing * 0.5),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.network(widget.item.foto, height: 150, fit: BoxFit.cover),
-                SizedBox(height: 20),
+                Image.network(widget.item.foto, height: imageSize, fit: BoxFit.cover),
+                SizedBox(height: spacing),
+
                 Text(
                   widget.item.nome,
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: spacing * 0.5),
+
                 Text(
                   widget.item.descricao,
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16),
+                  style: TextStyle(fontSize: fontSize * 0.8),
                 ),
+                SizedBox(height: spacing),
+
+                // Separador responsivo
                 Container(
-                  margin: EdgeInsets.symmetric(vertical: 20),
+                  margin: EdgeInsets.symmetric(vertical: spacing * 0.3),
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
+                      Container(width: screenWidth * 0.7, height: 1.5, color: Colors.black54),
                       Container(
-                        width: 550,
-                        height: 2,
-                        color: Colors.black54,
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 16),
+                        padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                         decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black26, width: 2),
+                          border: Border.all(color: Colors.black26, width: 1.5),
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(50),
+                          borderRadius: BorderRadius.circular(40),
                         ),
-                        child: SizedBox(width: 150, height: 40),
-                      ),
-                      Text(
-                        widget.item.calorias,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red,
+                        child: Text(
+                          widget.item.calorias,
+                          style: TextStyle(fontSize: fontSize * 0.9, fontWeight: FontWeight.bold, color: Colors.red),
                         ),
                       ),
                     ],
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+
+                // Itens secundários espaçados dinamicamente
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: spacing,
+                  runSpacing: spacing * 0.5,
                   children: [
-                    Column(
-                      children: [
-                        Image.network(widget.item.item1_imagem, width: 30, fit: BoxFit.cover),
-                        Text(widget.item.item1_nome, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Image.network(widget.item.item2_imagem, width: 30, fit: BoxFit.cover),
-                        Text(widget.item.item2_nome, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Image.network(widget.item.item3_imagem, width: 30, fit: BoxFit.cover),
-                        Text(widget.item.item3_nome, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
-                      ],
-                    ),
+                    itemWidget(widget.item.item1_imagem, widget.item.item1_nome, screenWidth),
+                    itemWidget(widget.item.item2_imagem, widget.item.item2_nome, screenWidth),
+                    itemWidget(widget.item.item3_imagem, widget.item.item3_nome, screenWidth),
                   ],
                 ),
+                SizedBox(height: spacing),
+
+                // Contador espaçado conforme a tela
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    botaoQuantidade(Icons.remove, Colors.red, () {
+                      setState(() {
+                        if (contador > 0) contador--;
+                      });
+                    }),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: spacing * 0.4),
+                      child: Text(
+                        "$contador",
+                        style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    botaoQuantidade(Icons.add, Colors.green, () {
+                      setState(() {
+                        contador++;
+                      });
+                    }),
+                  ],
+                ),
+                SizedBox(height: spacing),
+
+                // Preço Total espaçado dinamicamente
                 Container(
-                  margin: EdgeInsets.symmetric(vertical: 20),
+                  margin: EdgeInsets.symmetric(vertical: spacing * 0.3),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                        padding: EdgeInsets.all(1),
-                        margin: EdgeInsets.symmetric(horizontal: 20),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 5,
-                              offset: Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: IconButton(
-                          icon: Icon(Icons.remove, size: 30, color: Colors.red),
-                          onPressed: () {
-                            setState(() {
-                              if (contador > 0) contador--;
-                            });
-                          },
-                        ),
-                      ),
-
+                      Image.network('https://cdn-icons-png.flaticon.com/512/709/709505.png',
+                          width: screenWidth * 0.08, fit: BoxFit.cover),
+                      SizedBox(width: spacing * 0.3),
                       Text(
-                        "$contador",
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-
-                      Container(
-                        padding: EdgeInsets.all(1),
-                        margin: EdgeInsets.symmetric(horizontal: 20),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 5,
-                              offset: Offset(0, 3),
-                            ),
-                          ],
-                        ),
-
-                        child: IconButton(
-                          icon: Icon(Icons.add, size: 30, color: Colors.green),
-                          onPressed: () {
-                            setState(() {
-                              contador++;
-                            });
-                          },
-                        ),
-                      ),
+                        "Total: R\$ $precoTotal",
+                        style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
+                      )
                     ],
                   ),
-                ),
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.network('https://cdn-icons-png.flaticon.com/512/709/709505.png', width: 50, fit: BoxFit.cover),
-                      SizedBox(width: 10),
-                      Text("Total: R\$ $precoTotal", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))
-                   ],
-                  )
                 ),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  // Widget para exibir os itens secundários de forma adaptável
+  Widget itemWidget(String imageUrl, String nome, double screenWidth) {
+    return Column(
+      children: [
+        Image.network(imageUrl, width: screenWidth * 0.1, fit: BoxFit.cover),
+        SizedBox(height: 5),
+        Text(
+          nome,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: screenWidth * 0.035, fontWeight: FontWeight.bold),
+        ),
+      ],
+    );
+  }
+
+  // Widget para os botões de adicionar/remover com espaçamento adaptável
+  Widget botaoQuantidade(IconData icon, Color color, VoidCallback onPressed) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: IconButton(
+        icon: Icon(icon, size: 25, color: color),
+        onPressed: onPressed,
       ),
     );
   }
